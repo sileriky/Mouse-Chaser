@@ -16,17 +16,32 @@
             <li>3 lives.</li>
         </ul>
         
-        <canvas id="playArea" width="500" height="250" style="border:1px solid #000" />
+        <canvas id="playArea" width="500" height="250" style="border:1px solid #000" onmousedown="updatePlayerPos(event)"/>
         <script>
-            //Thank the [INSERT DEITY NAME HERE] for w3schools.com
+            //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             
             //Reference the canvas and collect the context.
             var canvas = document.getElementById("playArea");
             var ctx = canvas.getContext("2d");
             
             //Enemy square
-            ctx.strokeStyle = "#FF0000";
+            ctx.strokeStyle = "#F00";
             ctx.strokeRect(10,10,75,75);
+
+            //Player square
+            ctx.strokeStyle = "#0B0";
+            var plrsqr = ctx.strokeRect(200,10,75,75);
+            
+            //For the record, why can't I update the position of a thing on a canvas? :(
+            function updatePlayerPos(event) {
+                //Mouse coords. plrx -> Player X
+                /*
+                    Get player (actually mouse) coords.
+                    For the time being, redraw to new pos. (teleportation)
+                    In the future, maybe "smooth" out the movement.
+                 */
+            }
+
         </script>
     </body>
 </html>
