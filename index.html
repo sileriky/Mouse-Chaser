@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <style>
+            body {
+                margin-left: 2%;
+            }
+        </style>
+        
+    </head>
+    <body>
+        <h1>Mouse Chaser</h1>
+        <p>Move the mosue around the canvas.</p>
+        <ul>
+            <li>Square that moves with mouse.</li>
+            <li>Square that chases the player.</li>
+            <li>3 lives.</li>
+        </ul>
+        
+        <canvas id="playArea" width="500" height="250" style="border:1px solid #000" />
+        <script>
+            //Thank the [INSERT DEITY NAME HERE] for w3schools.com
+            
+            //Reference the canvas and collect the context.
+            var canvas = document.getElementById("playArea");
+            var ctx = canvas.getContext("2d");
+            
+            //Enemy square
+            ctx.strokeStyle = "#FF0000";
+            ctx.strokeRect(10,10,75,75);
+        </script>
+    </body>
+</html>
