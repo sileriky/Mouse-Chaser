@@ -16,7 +16,7 @@
             <li>3 lives.</li>
         </ul>
         
-        <canvas id="playArea" width="500" height="250" style="border:1px solid #000"></canvas>
+        <canvas id="playArea" width="500" height="250" style="border:1px solid #000" onload="startGame()" onmousemove="playerPiece.newPos(event)"></canvas>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
@@ -25,6 +25,7 @@
             
             
             //Initiate game pieces and begin animation...
+            var playerPiece;
             function startGame() {
                 var gameSpace = {
                     canvas : document.getElementById("playArea"),
@@ -33,6 +34,11 @@
                 }   
                 var playerPiece = new gamePiece(75, 75, "#0B0", 200, 10, "player");
                 //var enemyPiece = new gamePiece(75, 75, "#F00", 10, 10, "enemy");
+                
+                problematicCanvas = document.getElementById("playArea");
+                problematicCanvas.addEventListener("load",startGame);
+                problematicCanvas.addEventListener("mousemove",playerPiece.newPos);
+
                 window.requestAnimationFrame(updateScreen);
             }
             
@@ -69,9 +75,9 @@
             //Canvas doesn't seem to be happy with the "lack" of playerPiece.
             //Let's make it aware of it after we made it! Hopefully this works.
             
-            problematicCanvas = document.getElementById("playArea");
-            problematicCanvas.onload = "startGame()";
-            problematicCanvas.onmousemove = "playerPiece.newPos(event)";
+            //problematicCanvas = document.getElementById("playArea");
+            //problematicCanvas.addEventListener("load",startGame);
+            //problematicCanvas.addEventListener("mousemove",playerPiece.newPos);
 
             //Good news, no more errors.
             //Bad news, no response of any kind???
