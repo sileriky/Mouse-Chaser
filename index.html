@@ -7,7 +7,7 @@
         </style>
         
     </head>
-    <body>
+    <body onload="startGame()">
         <h1>Mouse Chaser</h1>
         <p>Move the mosue around the canvas.</p>
         <ul>
@@ -16,96 +16,104 @@
             <li>3 lives.</li>
         </ul>
         
-        <canvas id="playArea" width="500" height="250" style="border:1px solid #000"></canvas>
+        <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
             
-            //Object for a canvas called playArea. Note: should only work with one canvas, afaik.
-            
-            
-            //Initiate game pieces and begin animation...
             var playerPiece;
+            var enemyPiece;
+
             function startGame() {
-                var gameSpace = {
-                    canvas : document.getElementById("playArea"),
-                    context : this.canvas.getContext("2d"),
-                    clear : function() {this.context.clearRect(0,0,this.canvas.width,this.canvas.height);}
-                }   
-                var playerPiece = new gamePiece(75, 75, "#0B0", 200, 10, "player");
-                //var enemyPiece = new gamePiece(75, 75, "#F00", 10, 10, "enemy");
-                
-                problematicCanvas = document.getElementById("playArea");
-                problematicCanvas.addEventListener("load",startGame);
-                problematicCanvas.addEventListener("mousemove",playerPiece.newPos);
-
-                window.requestAnimationFrame(updateScreen);
+                gameSpace.start();
+                playerPiece = new gamePiece(75, 75, "#0B0", 200, 10);
+                enemyPiece = new gamePiece(75, 75, "#F00", 10, 10);
             }
-            
-            //This, this, this... also this
-            //Blank piece inside a canvas. Relies on gameSpace object.
-            function gamePiece(width, height, colour, x, y, behaviourType) {
-                this.width = width; 
-                this.height = height;  
-                this.x = x; 
-                this.y = y; 
-                this.updatePiece = function() {
-                    ctx = gameSpace.context; //could this be put outside of this function?
-                    ctx.strokeStyle = colour; //also this
-                    ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+            var gameSpace = {
+                canvas : document.createElement("canvas"),
+                start : function() {
+                    this.canvas.width = 500;
+                    this.canvas.height = 250;
+                    this.canvas.style = "border:1px solid #000";
+                    this.context = this.canvas.getContext("2d");
+
+                    //Pick the pre-existing playArea and replace it with a less annoying one.
+                    var oldCanvas = document.getElementById("playArea");
+                    oldCanvas.parentNode.replaceChild(this.canvas, oldCanvas);
+                    
+                    //NOTE: The change to animation frame made this noticeably smoother.
+                    //this.interval = setInterval(updateGameArea, 20);
+                    window.requestAnimationFrame(updateGameSpace);
+                    this.canvas.addEventListener('mousemove', function (e) {
+                        gameSpace.plrX = e.offsetX;
+                        gameSpace.plrY = e.offsetY;
+                    })
+                },
+                clear : function(){this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)}
+            }
+
+            function gamePiece(width, height, color, x, y) {
+                this.width = width;
+                this.height = height;
+                this.x = x;
+                this.y = y;
+                this.update = function() {
+                    ctx = gameSpace.context;
+                    ctx.fillStyle = color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
                 }
-                //Update pos based on behaviour
-                if (behaviourType = "player") {
-                    this.newPos = function(e) {
-                        this.x = e.clientX;
-                        this.y = e.clientY;
+                this.crashWith = function(otherobj) {
+
+                    var myleft = this.x;
+                    var myright = this.x + (this.width);
+                    var mytop = this.y;
+                    var mybottom = this.y + (this.height);
+                    var otherleft = otherobj.x;
+                    var otherright = otherobj.x + (otherobj.width);
+                    var othertop = otherobj.y;
+                    var otherbottom = otherobj.y + (otherobj.height);
+                    var crash = true;
+                    if ((mybottom < othertop) ||
+                        (mytop > otherbottom) ||
+                        (myright < otherleft) ||
+                        (myleft > otherright)) {
+                    crash = false;
                     }
-                } else if (behaviourType = "enemy") {
-                    this.newPos = function() {} //FILL ME IN
-                };
-            }
-
-            function updateScreen() {
-                gameSpace.clear();
-                playerPiece.updatePiece();
-                //enemyPiece.newPos();
-            }
-
-            //Damn load order...
-            //Canvas doesn't seem to be happy with the "lack" of playerPiece.
-            //Let's make it aware of it after we made it! Hopefully this works.
-            
-            //problematicCanvas = document.getElementById("playArea");
-            //problematicCanvas.addEventListener("load",startGame);
-            //problematicCanvas.addEventListener("mousemove",playerPiece.newPos);
-
-            //Good news, no more errors.
-            //Bad news, no response of any kind???
-
-
-            /*
-            //Reference the canvas and collect the context.
-            var canvas = document.getElementById("playArea");
-            var ctx = canvas.getContext("2d");
-            
-            //Enemy square
-            ctx.strokeStyle = "#F00";
-            ctx.strokeRect(10,10,75,75);
-
-            //Player square
-            ctx.strokeStyle = "#0B0";
-            var plrsqr = ctx.strokeRect(200,10,75,75);
-            
-            //For the record, why can't I update the position of a thing on a canvas? :(
-            function updatePlayerPos(event) {
-                //Mouse coords. plrx -> Player X
+                    return crash;
+                }
                 
-                    Get player (actually mouse) coords.
-                    For the time being, redraw to new pos. (teleportation)
-                    In the future, maybe "smooth" out the movement.    
             }
 
-            */
+            function updateGameSpace() {
+                if (enemyPiece.crashWith(playerPiece)) {
+                    //console.log("Crashed!");
+                    window.cancelAnimationFrame(currentFrame);
+                } else {
+                    //console.log("Survived!");
+                    gameSpace.clear();
+                    //Check the existence of mousemove event coords.
+                    //Then move the playerPiece's middle to the mouse.
+                    //Player piece movement
+                    if (gameSpace.plrX && gameSpace.plrY) {
+                        playerPiece.x = gameSpace.plrX-(playerPiece.width/2);
+                        playerPiece.y = gameSpace.plrY-(playerPiece.height/2);    
+                    }
+
+                    //Add enemy code
+                    //Enemy piece movement
+
+                    playerPiece.update();
+                    enemyPiece.update();
+                    currentFrame = window.requestAnimationFrame(updateGameSpace);
+                    }
+                
+            }
+
+/* Most of the code above is adapted from w3schools.
+Idea: How much could I remove, without breaking this?
+
+*/
 
         </script>
     </body>
