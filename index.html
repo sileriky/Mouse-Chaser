@@ -16,7 +16,10 @@
             <li>3 lives.</li>
             <li>EXTRA: Smooth movement (time for trig)</li>
         </ul>
-        
+        <div>
+            <span id="displayX">New X: </span><br/>
+            <span id="displayY">New Y: </span>
+        </div>
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
         <button onclick="fullGameReset()">Reset</button>
@@ -28,6 +31,8 @@
             var enemyPiece;
             var playerLives = 3;
             var lifeCounter = document.getElementById("lifeCounter");
+            var displayX = document.getElementById("displayX");
+            var displayY = document.getElementById("displayY");
 
             function startGame() {
                 gameSpace.start();
@@ -104,7 +109,7 @@
                 
             }
 
-            var enemySpeed = 1;
+            var enemySpeed = 0.25;
             function updateGame() {
                 if (enemyPiece.crashWith(playerPiece)) {
                     console.log("Crashed!");
@@ -130,6 +135,14 @@
                     //Add enemy code
                     //Enemy piece movement
                     
+                    newEnemyCoords = calcNewCoords(enemyPiece,playerPiece);
+                    displayX.innerHTML = "New X: "+newEnemyCoords.x;
+                    displayY.innerHTML = "New Y: "+newEnemyCoords.y;
+
+                    enemyPiece.x += newEnemyCoords.x*enemySpeed;
+                    enemyPiece.y += newEnemyCoords.y*enemySpeed;
+
+                    /*
                     if (enemyPiece.relX < playerPiece.relX-enemySpeed) {
                         enemyPiece.x += enemySpeed;
                     } else if (enemyPiece.relX > playerPiece.relX+enemySpeed) {
@@ -139,7 +152,7 @@
                         enemyPiece.y += enemySpeed;
                     } else if (enemyPiece.relY > playerPiece.relY+enemySpeed) {
                         enemyPiece.y -= enemySpeed;
-                    }
+                    }*/
 
                     playerPiece.update();
                     enemyPiece.update();
@@ -152,6 +165,18 @@
                 playerLives = 3;
                 lifeCounter.innerHTML = playerLives + " lives left.";
                 resetGame();
+            }
+            
+            //Take the x and y coords of 2 objects and calculate the new x and y coords 
+            //for getting from the starting object to the destination object.
+            function calcNewCoords(startObj,destinationObj) {
+                var dX = destinationObj.relX - startObj.relX; //Delta X
+                var dY = destinationObj.relY - startObj.relY; //Delta Y
+                var theta = Math.atan(dY/dX)* 180 / Math.PI; 
+                //Angle (from x-axis to the line between these 2 points) in degress.
+                var x = theta/90;
+                var y = 1-x;
+                return {x,y};
             }
 
 /* Most of the code above is adapted from w3schools.
