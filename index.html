@@ -18,6 +18,7 @@
         
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
+        <button onclick="fullGameReset()">Reset</button>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
@@ -128,8 +129,14 @@
                     playerPiece.update();
                     enemyPiece.update();
                     currentFrame = window.requestAnimationFrame(updateGame);
-                    }
+                }
                 
+            }
+
+            function fullGameReset() {
+                playerLives = 3;
+                lifeCounter.innerHTML = playerLives + " lives left.";
+                resetGame();
             }
 
 /* Most of the code above is adapted from w3schools.
