@@ -16,12 +16,10 @@
             <li>3 lives.</li>
             <li>EXTRA: Smooth movement (time for trig)</li>
         </ul>
-        <div>
-            <span id="displayX">New X: </span><br/>
-            <span id="displayY">New Y: </span><br/>
-        </div>
+
+        
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
-        <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left</div>
+        <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
         <button onclick="fullGameReset()">Reset</button>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
@@ -147,19 +145,7 @@
 
                     enemyPiece.x += newEnemyCoords.x;
                     enemyPiece.y += newEnemyCoords.y;
-
-                    /*
-                    if (enemyPiece.relX < playerPiece.relX-enemySpeed) {
-                        enemyPiece.x += enemySpeed;
-                    } else if (enemyPiece.relX > playerPiece.relX+enemySpeed) {
-                        enemyPiece.x -= enemySpeed;
                     }
-                    if (enemyPiece.relY < playerPiece.relY-enemySpeed) {
-                        enemyPiece.y += enemySpeed;
-                    } else if (enemyPiece.relY > playerPiece.relY+enemySpeed) {
-                        enemyPiece.y -= enemySpeed;
-                    }*/
-
                     playerPiece.update();
                     enemyPiece.update();
                     currentFrame = window.requestAnimationFrame(updateGame);
