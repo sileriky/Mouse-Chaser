@@ -1,0 +1,20 @@
+<html>
+    <head></head>
+    <body>
+        <h1>Testing Area</h1>
+        <p id="testTextID">Test Test Test</p>
+        <script>
+        //Q1 Can I use this.functionName = function(param1, param2,...)?
+        function parentTest() {
+            toChange = document.getElementById("testTextID")
+            this.testerFunction = function(someTester) {
+                toChange.innerHTML = someTester;
+            }
+        }
+        var testerObject = new parentTest();
+        testerObject.testerFunction("Stuff");
+        //A2 Yes, yes I can. I feel like this is wrong, but it will have to do for now.
+        //Next Steps: After merging this with a MouseMove event, look for a better way, please... You can thank yourself later
+        </script>
+    </body>
+</html>
