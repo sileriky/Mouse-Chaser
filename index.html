@@ -14,7 +14,9 @@
             <li>Square that moves with mouse.</li>
             <li>Square that chases the player.</li>
             <li>3 lives.</li>
+            <li>EXTRA: Smooth movement (time for trig)</li>
         </ul>
+
         
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
@@ -25,21 +27,24 @@
             
             var playerPiece;
             var enemyPiece;
-            var playerLives = 3;
+            var playerLives = 4;
             var lifeCounter = document.getElementById("lifeCounter");
+            var displayX = document.getElementById("displayX");
+            var displayY = document.getElementById("displayY");
+            var displayTheta = document.getElementById("displayTheta");
 
             function startGame() {
                 gameSpace.start();
                 playerPiece = new gamePiece(25, 25, "#0B0", 465, 10);
-                enemyPiece = new gamePiece(25, 25, "#F00", 10, 10);
+                enemyPiece = new gamePiece(25, 25, "#F00", 240, 115);
             }
 
             function resetGame() {
                 gameSpace.clear();
                 playerPiece.x = 465;
                 playerPiece.y = 10;
-                enemyPiece.x = 10;
-                enemyPiece.y = 10;
+                enemyPiece.x = 240;
+                enemyPiece.y = 115;
                 playerPiece.update();
                 enemyPiece.update();
                 console.log("Game Reset!");
@@ -49,13 +54,14 @@
             var gameSpace = {
                 canvas : document.createElement("canvas"),
                 start : function() {
-                    this.canvas.width = 500;
-                    this.canvas.height = 250;
+                    var oldCanvas = document.getElementById("playArea");
+                    this.canvas.width = oldCanvas.width;
+                    this.canvas.height = oldCanvas.height;
                     this.canvas.style = "border:1px solid #000";
                     this.context = this.canvas.getContext("2d");
 
                     //Pick the pre-existing playArea and replace it with a less annoying one.
-                    var oldCanvas = document.getElementById("playArea");
+                    //var oldCanvas = document.getElementById("playArea");
                     oldCanvas.parentNode.replaceChild(this.canvas, oldCanvas);
                     
                     //NOTE: The change from setInterval to animation frame made this noticeably smoother.
@@ -103,7 +109,10 @@
                 
             }
 
-            var enemySpeed = 1;
+            var enemySpeed = 0.5;
+            var currentFrame = 0;
+            var delta = 0;
+            var lastFrame = 0;
             function updateGame() {
                 if (enemyPiece.crashWith(playerPiece)) {
                     console.log("Crashed!");
@@ -112,7 +121,7 @@
                     if (playerLives <= 0) {
                         lifeCounter.innerHTML = "Game Over";
                     } else {
-                        lifeCounter.innerHTML = playerLives + " lives left.";
+                        lifeCounter.innerHTML = playerLives + " lives left";
                         resetGame();
                     }
                 } else {
@@ -129,17 +138,14 @@
                     //Add enemy code
                     //Enemy piece movement
                     
-                    if (enemyPiece.relX < playerPiece.relX-enemySpeed) {
-                        enemyPiece.x += enemySpeed;
-                    } else if (enemyPiece.relX > playerPiece.relX+enemySpeed) {
-                        enemyPiece.x -= enemySpeed;
-                    }
-                    if (enemyPiece.relY < playerPiece.relY-enemySpeed) {
-                        enemyPiece.y += enemySpeed;
-                    } else if (enemyPiece.relY > playerPiece.relY+enemySpeed) {
-                        enemyPiece.y -= enemySpeed;
-                    }
+                    newEnemyCoords = calcNewCoords(enemyPiece,playerPiece,currentFrame);
+                    displayX.innerHTML = "New X: " + newEnemyCoords.x;
+                    displayY.innerHTML = "New Y: " + newEnemyCoords.y;
+                    //displayTheta.innerHTML = "Angle: " + newEnemyCoords.theta;
 
+                    enemyPiece.x += newEnemyCoords.x;
+                    enemyPiece.y += newEnemyCoords.y;
+                    }
                     playerPiece.update();
                     enemyPiece.update();
                     currentFrame = window.requestAnimationFrame(updateGame);
@@ -149,8 +155,33 @@
 
             function fullGameReset() {
                 playerLives = 3;
-                lifeCounter.innerHTML = playerLives + " lives left.";
+                lifeCounter.innerHTML = playerLives + " lives left";
                 resetGame();
+            }
+            
+            //Take the x and y coords of 2 objects and calculate the new x and y coords 
+            //for getting from the starting object to the destination object.
+            //Ended up using this: https://www.reddit.com/r/javascript/comments/2pty1w/how_do_i_make_an_object_chase_an_other_object/
+            function calcNewCoords(startObj,destinationObj,currentFrame) {
+                var dx = destinationObj.relX - startObj.relX; //Delta X
+                var dy = destinationObj.relY - startObj.relY; //Delta Y
+                
+                // normalize (= direction vector)
+                // (a direction vector has a length of 1)
+                var length = Math.sqrt(dx * dx + dy * dy);
+                if (length) {
+                    dx /= length;
+                    dy /= length;
+                }
+                delta = currentFrame - lastFrame;
+                lastFrame = currentFrame;
+                // move
+                // delta is the elapsed time in seconds
+                // SPEED is the speed in units per second (UPS)
+                var x = dx * delta * enemySpeed;
+                var y = dy * delta * enemySpeed;
+
+                return {x,y};
             }
 
 /* Most of the code above is adapted from w3schools.
