@@ -9,7 +9,7 @@
     </head>
     <body onload="startGame()">
         <h1>Mouse Chaser</h1>
-        <p>Move the mosue around the canvas.</p>
+        <p>Move the mouse around the canvas.</p>
         <ul>
             <li>Square that moves with mouse.</li>
             <li>Square that chases the player.</li>
@@ -17,17 +17,32 @@
         </ul>
         
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
+        <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
             
             var playerPiece;
             var enemyPiece;
+            var playerLives = 3;
+            var lifeCounter = document.getElementById("lifeCounter");
 
             function startGame() {
                 gameSpace.start();
                 playerPiece = new gamePiece(75, 75, "#0B0", 200, 10);
                 enemyPiece = new gamePiece(75, 75, "#F00", 10, 10);
+            }
+
+            function resetGame() {
+                gameSpace.clear();
+                playerPiece.x = 200;
+                playerPiece.y = 10;
+                enemyPiece.x = 10;
+                enemyPiece.y = 10;
+                playerPiece.update();
+                enemyPiece.update();
+                console.log("Game Reset!");
+                setTimeout(updateGame,3000);
             }
 
             var gameSpace = {
@@ -42,9 +57,9 @@
                     var oldCanvas = document.getElementById("playArea");
                     oldCanvas.parentNode.replaceChild(this.canvas, oldCanvas);
                     
-                    //NOTE: The change to animation frame made this noticeably smoother.
+                    //NOTE: The change from setInterval to animation frame made this noticeably smoother.
                     //this.interval = setInterval(updateGameArea, 20);
-                    window.requestAnimationFrame(updateGameSpace);
+                    window.requestAnimationFrame(updateGame);
                     this.canvas.addEventListener('mousemove', function (e) {
                         gameSpace.plrX = e.offsetX;
                         gameSpace.plrY = e.offsetY;
@@ -78,17 +93,24 @@
                         (mytop > otherbottom) ||
                         (myright < otherleft) ||
                         (myleft > otherright)) {
-                    crash = false;
+                            crash = false;
                     }
                     return crash;
                 }
                 
             }
 
-            function updateGameSpace() {
+            function updateGame() {
                 if (enemyPiece.crashWith(playerPiece)) {
-                    //console.log("Crashed!");
+                    console.log("Crashed!");
                     window.cancelAnimationFrame(currentFrame);
+                    playerLives -= 1;
+                    if (playerLives <= 0) {
+                        lifeCounter.innerHTML = "Game Over";
+                    } else {
+                        lifeCounter.innerHTML = playerLives + " lives left.";
+                        resetGame();
+                    }
                 } else {
                     //console.log("Survived!");
                     gameSpace.clear();
@@ -105,7 +127,7 @@
 
                     playerPiece.update();
                     enemyPiece.update();
-                    currentFrame = window.requestAnimationFrame(updateGameSpace);
+                    currentFrame = window.requestAnimationFrame(updateGame);
                     }
                 
             }
