@@ -25,30 +25,20 @@
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
             
+            //VARIABLE DEFINITIONS
             var playerPiece;
             var enemyPiece;
             var playerLives = 4;
+            var enemySpeed = 2;
+            var currentFrame = 0;
+            var delta = 0;
+            var lastFrame = 0;
+
+            //DOM GRABBERS
             var lifeCounter = document.getElementById("lifeCounter");
-            var displayX = document.getElementById("displayX");
-            var displayY = document.getElementById("displayY");
-            var displayTheta = document.getElementById("displayTheta");
+            var resetButton = document.getElementById("resetButton");
 
-            function startGame() {
-                gameSpace.start();
-                playerPiece = new gamePiece(25, 25, "#0B0", 465, 10);
-                enemyPiece = new gamePiece(25, 25, "#F00", 240, 115);
-            }
-
-            function resetGame() {
-                gameSpace.clear();
-                playerPiece.resetPiece();
-                enemyPiece.resetPiece();
-                playerPiece.update();
-                enemyPiece.update();
-                console.log("Game Reset!");
-                setTimeout(updateGame,1500);
-            }
-
+            //OBJECT DEFINITIONS
             var gameSpace = {
                 canvas : document.createElement("canvas"),
                 start : function() {
@@ -72,7 +62,7 @@
                 },
                 clear : function(){this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)}
             }
-
+            
             function gamePiece(width, height, color, x, y) {
                 this.width = width;
                 this.height = height;
@@ -113,10 +103,23 @@
                 
             }
 
-            var enemySpeed = 2;
-            var currentFrame = 0;
-            var delta = 0;
-            var lastFrame = 0;
+            //FUNCTION DEFINITIONS
+            function startGame() {
+                gameSpace.start();
+                playerPiece = new gamePiece(25, 25, "#0B0", 465, 10);
+                enemyPiece = new gamePiece(25, 25, "#F00", 240, 115);
+            }
+
+            function resetGame() {
+                gameSpace.clear();
+                playerPiece.resetPiece();
+                enemyPiece.resetPiece();
+                playerPiece.update();
+                enemyPiece.update();
+                console.log("Game Reset!");
+                setTimeout(updateGame,1500);
+            }
+
             function updateGame() {
                 if (enemyPiece.crashWith(playerPiece)) {
                     console.log("Crashed!");
@@ -161,7 +164,7 @@
                 PS2: Manipulate the button such that you can't press it consecutivelly
                 NOTE: This doesn't fix the issue. I plan to spend time designing this properly.
             */
-            var resetButton = document.getElementById("resetButton");
+            
             resetButton.onclick = function(){
                 resetButton.disabled = true;
                 fullGameReset();
@@ -202,10 +205,10 @@
                 return {x,y};
             }
 
-/* Most of the code above is adapted from w3schools.
-Idea: How much could I remove, without breaking this?
+            /* Most of the code above is adapted from w3schools.
+            Idea: How much could I remove, without breaking this?
 
-*/
+            */
 
         </script>
     </body>
