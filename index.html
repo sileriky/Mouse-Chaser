@@ -20,37 +20,25 @@
         
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
-        <button onclick="fullGameReset()">Reset</button>
+        <button id="resetButton">Reset</button>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
             
+            //VARIABLE DEFINITIONS
             var playerPiece;
             var enemyPiece;
             var playerLives = 4;
+            var enemySpeed = 2;
+            var currentFrame = 0;
+            var delta = 0;
+            var lastFrame = 0;
+
+            //DOM GRABBERS
             var lifeCounter = document.getElementById("lifeCounter");
-            var displayX = document.getElementById("displayX");
-            var displayY = document.getElementById("displayY");
-            var displayTheta = document.getElementById("displayTheta");
+            var resetButton = document.getElementById("resetButton");
 
-            function startGame() {
-                gameSpace.start();
-                playerPiece = new gamePiece(25, 25, "#0B0", 465, 10);
-                enemyPiece = new gamePiece(25, 25, "#F00", 240, 115);
-            }
-
-            function resetGame() {
-                gameSpace.clear();
-                playerPiece.x = 465;
-                playerPiece.y = 10;
-                enemyPiece.x = 240;
-                enemyPiece.y = 115;
-                playerPiece.update();
-                enemyPiece.update();
-                console.log("Game Reset!");
-                setTimeout(updateGame,1500);
-            }
-
+            //OBJECT DEFINITIONS
             var gameSpace = {
                 canvas : document.createElement("canvas"),
                 start : function() {
@@ -67,19 +55,19 @@
                     //NOTE: The change from setInterval to animation frame made this noticeably smoother.
                     //this.interval = setInterval(updateGameArea, 20);
                     window.requestAnimationFrame(updateGame);
-                    this.canvas.addEventListener('mousemove', function (e) {
-                        gameSpace.plrX = e.offsetX;
-                        gameSpace.plrY = e.offsetY;
+                    this.canvas.addEventListener('mousemove', function (event) {
+                        gameSpace.plrX = event.offsetX;
+                        gameSpace.plrY = event.offsetY;
                     })
                 },
                 clear : function(){this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)}
             }
-
+            
             function gamePiece(width, height, color, x, y) {
                 this.width = width;
                 this.height = height;
-                this.x = x;
-                this.y = y;
+                this.x = this.initialX = x;
+                this.y = this.initialY = y;
                 this.update = function() {
                     ctx = gameSpace.context;
                     ctx.fillStyle = color;
@@ -106,13 +94,32 @@
                     }
                     return crash;
                 }
+
+                this.resetPiece = function() {
+                    this.x = this.initialX;
+                    this.y = this.initialY;
+                }
+
                 
             }
 
-            var enemySpeed = 2;
-            var currentFrame = 0;
-            var delta = 0;
-            var lastFrame = 0;
+            //FUNCTION DEFINITIONS
+            function startGame() {
+                gameSpace.start();
+                playerPiece = new gamePiece(25, 25, "#0B0", 465, 10);
+                enemyPiece = new gamePiece(25, 25, "#F00", 240, 115);
+            }
+
+            function resetGame() {
+                gameSpace.clear();
+                playerPiece.resetPiece();
+                enemyPiece.resetPiece();
+                playerPiece.update();
+                enemyPiece.update();
+                console.log("Game Reset!");
+                setTimeout(updateGame,1500);
+            }
+
             function updateGame() {
                 if (enemyPiece.crashWith(playerPiece)) {
                     console.log("Crashed!");
@@ -135,7 +142,6 @@
                         playerPiece.y = gameSpace.plrY-(playerPiece.height/2);    
                     }
 
-                    //Add enemy code
                     //Enemy piece movement
                     
                     newEnemyCoords = calcNewCoords(enemyPiece,playerPiece,currentFrame);
@@ -150,11 +156,29 @@
                 }
                 
             }
+            
+            /*ISSUE: The reset button calls this function EVERY TIME that it's pressed.
+                This results in the enemyPiece reaching higher than expected speeds.
+                Potential solution: introduce a "am I resetting right now?" flag
+                Result: No change (seemingly)
+                PS2: Manipulate the button such that you can't press it consecutivelly
+                NOTE: This doesn't fix the issue. I plan to spend time designing this properly.
+            */
+            
+            resetButton.onclick = function(){
+                resetButton.disabled = true;
+                fullGameReset();
+                setTimeout(recycleButton,3500);
+            }
+
+            function recycleButton(){
+                resetButton.disabled = false;
+            }
 
             function fullGameReset() {
                 playerLives = 3;
                 lifeCounter.innerHTML = playerLives + " lives left";
-                resetGame();
+                resetGame();             
             }
             
             //Take the x and y coords of 2 objects and calculate the new x and y coords 
@@ -178,14 +202,13 @@
                 // SPEED is the speed in units per second (UPS)
                 var x = dx * delta * enemySpeed;
                 var y = dy * delta * enemySpeed;
-
                 return {x,y};
             }
 
-/* Most of the code above is adapted from w3schools.
-Idea: How much could I remove, without breaking this?
+            /* Most of the code above is adapted from w3schools.
+            Idea: How much could I remove, without breaking this?
 
-*/
+            */
 
         </script>
     </body>
