@@ -49,10 +49,6 @@
                 setTimeout(updateGame,1500);
             }
 
-            function resetProcedure() {
-                
-            }
-
             var gameSpace = {
                 canvas : document.createElement("canvas"),
                 start : function() {
@@ -158,19 +154,22 @@
                 
             }
             
-            //ISSUE: The reset button calls this function EVERY TIME that it's pressed.
-            //This results in the enemyPiece reaching higher than expected speeds.
-            //Potential solution: introduce a "am I resetting right now?" flag
-            //Result: No change (seemingly)
-            //PS2: Manipulate the button such that you can't press consecutivelly
+            /*ISSUE: The reset button calls this function EVERY TIME that it's pressed.
+                This results in the enemyPiece reaching higher than expected speeds.
+                Potential solution: introduce a "am I resetting right now?" flag
+                Result: No change (seemingly)
+                PS2: Manipulate the button such that you can't press it consecutivelly
+                NOTE: This doesn't fix the issue. I plan to spend time designing this properly.
+            */
             var resetButton = document.getElementById("resetButton");
             resetButton.onclick = function(){
                 resetButton.disabled = true;
                 fullGameReset();
+                setTimeout(recycleButton,3500);
             }
 
             function recycleButton(){
-
+                resetButton.disabled = false;
             }
 
             function fullGameReset() {
