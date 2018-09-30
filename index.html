@@ -19,12 +19,12 @@
 
         
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
-        <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left.</div>
-        <button id="resetButton">Reset</button>
+        <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left</div>
+        <button id="resetButton" onclick="window.location.reload(false);">Reset</button>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
-            
+
             //VARIABLE DEFINITIONS
             var playerPiece;
             var enemyPiece;
@@ -99,8 +99,6 @@
                     this.x = this.initialX;
                     this.y = this.initialY;
                 }
-
-                
             }
 
             //FUNCTION DEFINITIONS
@@ -159,27 +157,22 @@
             
             /*ISSUE: The reset button calls this function EVERY TIME that it's pressed.
                 This results in the enemyPiece reaching higher than expected speeds.
-                Potential solution: introduce a "am I resetting right now?" flag
+
+                Potential solution 1: introduce a "am I resetting right now?" flag
                 Result: No change (seemingly)
+
                 PS2: Manipulate the button such that you can't press it consecutivelly
+                Result: Annoying button (loses functionality for some time)
                 NOTE: This doesn't fix the issue. I plan to spend time designing this properly.
+
+                PS3: Wrap the main section of this code within a game init function?
+                Then, just call that? Hmm...
+                Result: The problem has gotten worse in a hillarious manner!
+
+                PS4: Refresh the page. I can't think of a better way to reinit the game...
+                Without reinitialing it every single time the button has been clicked...
             */
-            
-            resetButton.onclick = function(){
-                resetButton.disabled = true;
-                fullGameReset();
-                setTimeout(recycleButton,3500);
-            }
 
-            function recycleButton(){
-                resetButton.disabled = false;
-            }
-
-            function fullGameReset() {
-                playerLives = 3;
-                lifeCounter.innerHTML = playerLives + " lives left";
-                resetGame();             
-            }
             
             //Take the x and y coords of 2 objects and calculate the new x and y coords 
             //for getting from the starting object to the destination object.
@@ -204,12 +197,6 @@
                 var y = dy * delta * enemySpeed;
                 return {x,y};
             }
-
-            /* Most of the code above is adapted from w3schools.
-            Idea: How much could I remove, without breaking this?
-
-            */
-
         </script>
     </body>
 </html>
