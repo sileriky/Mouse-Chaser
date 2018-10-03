@@ -20,7 +20,7 @@
         
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left</div>
-        <button id="resetButton" onclick="window.location.reload(false);">Reset</button>
+        <button id="resetButton" onclick="fullGameReset();">Reset</button>
 
         <div id="CoordDisplay">X: <br/>Y: </div>
         <script>
@@ -59,11 +59,15 @@
                     this.canvas.width = oldCanvas.width;
                     this.canvas.height = oldCanvas.height;
                     this.canvas.style = "border:1px solid #000";
+                    this.canvas.id = "playArea";
+                    //canvasRef = this.canvas;
                     this.context = this.canvas.getContext("2d");
 
                     //Pick the pre-existing playArea and replace it with a less annoying one.
                     //var oldCanvas = document.getElementById("playArea");
                     oldCanvas.parentNode.replaceChild(this.canvas, oldCanvas);
+
+                    
                     
                     //NOTE: The change from setInterval to animation frame made this noticeably smoother.
                     //this.interval = setInterval(updateGameArea, 20);
@@ -72,16 +76,34 @@
                         gameSpace.plrX = event.offsetX;
                         gameSpace.plrY = event.offsetY;
                     });
-                    this.canvas.addEventListener("click", function(event){
-                        coordsTracker[coordsTrackerPos] = [event.offsetX,event.offsetY];
+                    this.canvas.addEventListener("click", function(){
+                        var canvasRef = document.getElementById("playArea");
+                        var mouseX = event.offsetX;
+                        var mouseY = event.offsetY;
+                        var cWidth = canvasRef.width;
+                        var cHeight = canvasRef.height;
+                        /*coordsTracker[coordsTrackerPos] = [mouseX,mouseY];
                         if (coordsTrackerPos < 3){
                             coordsTrackerPos++;
                         } else {
                             coordsTrackerPos = 0;
+                        }*/
+                        /*Guess which corner has been clicked 
+                            NOTE: Each corner IS DEFINED by its quadrant!
+                            NEXT: Figure out custom corners.
+                        */
+                        if (mouseX > (cWidth/2)) {
+                            coordsTrackerPos = 2; //Right side of canvas
+                        } else {
+                            coordsTrackerPos = 0; //Left side of canvas
                         }
-                            
-                        coordDisplay.innerHTML = "X: " + event.offsetX + " <br/>Y: " + event.offsetY + "<br/>" +coordsTracker;
-                        
+                        if (mouseY > (cHeight/2)) {
+                            coordsTrackerPos += 1;
+                        } else {
+                            coordsTrackerPos += 0;
+                        }
+                        coordsTracker[coordsTrackerPos] = [mouseX,mouseY];
+                        coordDisplay.innerHTML = "X: " + mouseX + " <br/>Y: " + mouseY + "<br/> Pos: " + coordsTrackerPos + "<br/>" + coordsTracker;
                     });
                 },
                 clear : function(){this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)}
@@ -195,8 +217,16 @@
 
                 PS4: Refresh the page. I can't think of a better way to reinit the game...
                 Without reinitialing it every single time the button has been clicked...
-            */
 
+                Current Situation: The button's initial behaviour doesn't affect 
+                the functionality of this game too much; thus, I shall implement its initial 
+                behaviour (in order to help implement extension 01, as well). 
+            */
+            function fullGameReset() {
+                playerLives = 3;
+                lifeCounter.innerHTML = playerLives + " lives left";
+                resetGame();
+            }
             
             //Take the x and y coords of 2 objects and calculate the new x and y coords 
             //for getting from the starting object to the destination object.
@@ -221,6 +251,8 @@
                 var y = dy * delta * enemySpeed;
                 return {x,y};
             }
+
+            	             
         </script>
     </body>
 </html>
