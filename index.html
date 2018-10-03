@@ -2,7 +2,7 @@
     <head>
         <style>
             body {
-                margin-left: 2%;
+                margin-left: 5%;
             }
         </style>
         
@@ -21,6 +21,8 @@
         <canvas id="playArea" width=500 height=250 style="border:1px solid #000"></canvas>
         <div id="lifeCounter" style="margin-top: 15px; font-size: 25px">3 lives left</div>
         <button id="resetButton" onclick="window.location.reload(false);">Reset</button>
+
+        <div id="CoordDisplay">X: <br/>Y: </div>
         <script>
             //Thank (the) [INSERT DEITY NAME HERE] for w3schools.com
             //EDIT: Also stackoverflow.com
@@ -33,10 +35,21 @@
             var currentFrame = 0;
             var delta = 0;
             var lastFrame = 0;
+            
+            var coordsTrackerPos = 0;
+            var coordsTracker = new Array(4);
+            /* Array constructor notes:
+                The constructor behaves differently under different circumstances.
+                If 1 parameter has been given, it will create an array of that length. 
+                Ex: new Array(4) => [,,,]
+                If 2 or more parameters have been given, it will create an array with those elements.
+                Ex: new Array(1,5,9) => [1,5,9]
+            */
 
             //DOM GRABBERS
             var lifeCounter = document.getElementById("lifeCounter");
             var resetButton = document.getElementById("resetButton");
+            var coordDisplay = document.getElementById("CoordDisplay");
 
             //OBJECT DEFINITIONS
             var gameSpace = {
@@ -55,10 +68,21 @@
                     //NOTE: The change from setInterval to animation frame made this noticeably smoother.
                     //this.interval = setInterval(updateGameArea, 20);
                     window.requestAnimationFrame(updateGame);
-                    this.canvas.addEventListener('mousemove', function (event) {
+                    this.canvas.addEventListener('mousemove', function(event) {
                         gameSpace.plrX = event.offsetX;
                         gameSpace.plrY = event.offsetY;
-                    })
+                    });
+                    this.canvas.addEventListener("click", function(event){
+                        coordsTracker[coordsTrackerPos] = [event.offsetX,event.offsetY];
+                        if (coordsTrackerPos < 3){
+                            coordsTrackerPos++;
+                        } else {
+                            coordsTrackerPos = 0;
+                        }
+                            
+                        coordDisplay.innerHTML = "X: " + event.offsetX + " <br/>Y: " + event.offsetY + "<br/>" +coordsTracker;
+                        
+                    });
                 },
                 clear : function(){this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)}
             }
@@ -104,8 +128,8 @@
             //FUNCTION DEFINITIONS
             function startGame() {
                 gameSpace.start();
-                playerPiece = new gamePiece(25, 25, "#0B0", 465, 10);
-                enemyPiece = new gamePiece(25, 25, "#F00", 240, 115);
+                playerPiece = new gamePiece(25, 25, "#0B0", 10, 215);
+                enemyPiece = new gamePiece(25, 25, "#F00", 465, 10);
             }
 
             function resetGame() {
